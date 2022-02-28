@@ -1,48 +1,45 @@
-; Author: Melvin Moreno
-; Auburn USERID: mem0282
-; I utilized the slides to memorize the registers.
+;Melvin Moreno
+;mem0282
+;Melvin_Moreno.asm
+;I received help from Matthew Freestone.
+
+; This program add and subtracts 32-bit Integers
 
 .386
-.model flat, stdcall
+.model flat,stdcall
 .stack 4096
-ExitProcess proto, dwExitCode:dword
+ExitProcess PROTO, dwExitCode:DWORD
+
 
 .data
-		input BYTE 1,2,3,4,5,6,7,8
-		shift BYTE 2
+    shift dword 2
+    input byte 1,2,3,4,5,6,7,8
+    output byte lengthof input dup(?)	
 .code
-		main proc
-			; clear up the registers to make sure there is no old values inside them
-			mov EAX, 0                        ; clear up EAX                       
-			mov EBX, 0		                  ; clear up EBX
-			mov ECX, 0                        ; clear up ECX
-			mov EDX, 0                        ; clear up EDX
+    main proc
+	mov eax, 0			;This loop will iterate length - shift times. 
+	mov ebx, 0
+	mov ecx, LENGTHOF input			;(this loop will place the 'non-wrapped' values)
+	sub ecx, shift			;Start writing from input at shift
+	mov edx, shift			;Start reading at 0
+    l1:	
+		mov al, input[ebx]			;Move the value from input into al
+		mov output[edx], al			;Move the value from al into output
+		inc ebx		;Increment the input index
+		inc edx			;Increment the output index
+    	loop l1
 
-			; setup EAX register with 1st and 2nd values from the input array
-			mov ah, input                     ; add 1st value from input into register
-			add ah, shift                     ; shift the value inside the register
-            mov al, input + 1                 ; add 2nd value from input into register
-			add al, shift                     ; shift the value inside the register
-				
-			; setup EBX register with 3rd and 4th values from the input array
-			mov bh, input + 2                 ; add 3rd value from input into register
-			add bh, shift                     ; shift the value inside the register
-            mov bl, input + 3                 ; add 4th value from input into register
-			add bl, shift                     ; shift the value inside the register
+		mov ecx, shift			;This loop will iterate shift times
+		mov edx, 0			;Start reading at index length - shift
+		mov ebx, LENGTHOF input			;Start writing at index 0.  
+		sub ebx, shift			;(this loop will place the 'wrapped' values)
+    l2:	
+	mov al, input[ebx]			;Move the value from input into al
+	mov output[edx], al			;Move the value from al into output
+	inc ebx			;Increment the input index
+	inc edx			;Increment the output index
+	loop l2
 
-			; setup ECX register with 5th and 6th values from the input array
-			mov ch, input + 4                 ; add 5th value from input into register
-			add ch, shift                     ; shift the value inside the register
-            mov cl, input + 5                 ; add 6th value from input into register
-			add cl, shift                     ; shift the value inside the register
-
-			; setup EDX register with 7th and 8th values from the input array
-			mov dh, input + 6                 ; add 7th value from input into register
-			add dh, shift                     ; shift the value inside the register
-            mov dl, input + 7                 ; add 8th value from input into register
-			add dl, shift                     ; shift the value inside the register
-
-			; exit the program
-			invoke ExitProcess, 0
-		main endp
-end main
+INVOKE ExitProcess,0
+main ENDP
+END main
